@@ -35,6 +35,8 @@ function initStarfield() {
             this.z = Math.random() * 2; // Depth simulation
             this.size = Math.random() * 2 + 0.1;
             this.speed = (Math.random() * 0.5 + 0.1) * speedFactor * 10 * (this.z + 1); // Closer stars move faster
+            this.size = Math.random() * 2 + 0.1; // 0.1 to 2.1
+            this.speed = (Math.random() * 0.5 + 0.1) * speedFactor * 10; // Moving up
             this.opacity = Math.random();
             this.blinkSpeed = Math.random() * 0.02 + 0.005;
             this.blinkDir = 1;
@@ -80,6 +82,9 @@ function initStarfield() {
             for (let i = stars.length; i < count; i++) {
                 stars.push(new Star());
             }
+        stars = [];
+        for (let i = 0; i < count; i++) {
+            stars.push(new Star());
         }
     }
 
@@ -118,6 +123,7 @@ function initScrollAnimation() {
 
     // Target both fade-up and fade-in classes
     const targets = document.querySelectorAll('.fade-up, .fade-in');
+    const targets = document.querySelectorAll('.fade-in-up');
     targets.forEach(target => {
         observer.observe(target);
     });
