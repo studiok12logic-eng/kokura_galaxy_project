@@ -228,7 +228,8 @@ function initStarfield() {
 function initScrollAnimation() {
     const options = {
         root: null, // viewport
-        rootMargin: '0px',
+        // Delay animation until element is closer to center (cut off bottom 40%)
+        rootMargin: '0px 0px -40% 0px',
         threshold: 0.1 // 10% visible
     };
 
