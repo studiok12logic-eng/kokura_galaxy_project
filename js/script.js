@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Intersection Observer for Scroll Animation
     initScrollAnimation();
+
+    // 3. Hero Entrance Animation
+    initHeroAnimation();
 });
 
 /**
@@ -29,6 +32,9 @@ function initStarfield() {
         reset(initial = false) {
             this.x = Math.random() * width;
             this.y = initial ? Math.random() * height : height;
+            this.z = Math.random() * 2; // Depth simulation
+            this.size = Math.random() * 2 + 0.1;
+            this.speed = (Math.random() * 0.5 + 0.1) * speedFactor * 10 * (this.z + 1); // Closer stars move faster
             this.size = Math.random() * 2 + 0.1; // 0.1 to 2.1
             this.speed = (Math.random() * 0.5 + 0.1) * speedFactor * 10; // Moving up
             this.opacity = Math.random();
@@ -52,6 +58,7 @@ function initStarfield() {
         }
 
         draw() {
+            // Parallax effect based on scroll Y could be added here
             ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
@@ -70,6 +77,11 @@ function initStarfield() {
         const refArea = 1920 * 1080;
         const count = Math.floor(baseStarCount * (area / refArea));
 
+        // Re-init stars if count changes significantly or just ensure we have enough
+        if (stars.length < count) {
+            for (let i = stars.length; i < count; i++) {
+                stars.push(new Star());
+            }
         stars = [];
         for (let i = 0; i < count; i++) {
             stars.push(new Star());
@@ -109,8 +121,22 @@ function initScrollAnimation() {
         });
     }, options);
 
+    // Target both fade-up and fade-in classes
+    const targets = document.querySelectorAll('.fade-up, .fade-in');
     const targets = document.querySelectorAll('.fade-in-up');
     targets.forEach(target => {
         observer.observe(target);
     });
+}
+
+/**
+ * C. Hero Section Entrance
+ */
+function initHeroAnimation() {
+    const heroContent = document.querySelector('.hero-content');
+    if (heroContent) {
+        setTimeout(() => {
+            heroContent.classList.add('visible');
+        }, 500);
+    }
 }
