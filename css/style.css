@@ -20,6 +20,7 @@
 }
 
 body {
+    background: radial-gradient(circle at 50% 30%, #1a1f35 0%, #050a14 60%, #000000 100%);
     background-color: var(--primary-dark);
     color: var(--text-white);
     font-family: var(--font-body);
@@ -528,7 +529,7 @@ body {
 .fade-up {
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    transition: opacity 1.8s ease-out, transform 1.8s ease-out;
 }
 
 .fade-up.visible {
@@ -540,9 +541,9 @@ body {
     opacity: 0;
     transform: scale(2) rotate(10deg);
     filter: blur(20px);
-    transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1),
-                transform 1.2s cubic-bezier(0.25, 1, 0.5, 1),
-                filter 1.2s ease-out;
+    transition: opacity 2s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 2.2s cubic-bezier(0.25, 1, 0.5, 1),
+                filter 2.2s ease-out;
 }
 
 .space-reveal.visible {
@@ -572,7 +573,7 @@ body {
 
 .fade-in {
     opacity: 0;
-    transition: opacity 1s ease-out;
+    transition: opacity 2s ease-out;
 }
 
 .fade-in.visible {
