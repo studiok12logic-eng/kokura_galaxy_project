@@ -70,7 +70,7 @@ body {
     left: 0;
     width: 100%;
     z-index: 1000;
-    background-color: rgba(5, 10, 20, 0.7);
+    background-color: rgba(5, 10, 20, 0.8);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -78,6 +78,48 @@ body {
     align-items: center;
     padding: 1rem 2rem;
     box-sizing: border-box;
+}
+
+/* Progressive Blur Overlay */
+.blur {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.blur div {
+    --blur: calc(sin(((var(--layers) - var(--i)) / var(--layers)) * 90deg) * var(--blur-max));
+    --stop: calc(sin(((var(--i)) / var(--layers)) * 90deg) * var(--mask-stop));
+    position: absolute;
+    inset: 0;
+}
+
+.blur div::after {
+    content: '';
+    position: absolute;
+    inset: 0 -250%; /* Extended width for safety */
+    backdrop-filter: blur(calc(var(--blur) * 1px));
+    mask: linear-gradient(
+        180deg,
+        #0000 0 calc((100 - var(--stop)) * 1%),
+        #000 100%
+    );
+    -webkit-mask: linear-gradient(
+        180deg,
+        #0000 0 calc((100 - var(--stop)) * 1%),
+        #000 100%
+    );
+}
+
+.blur div::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(var(--stop) * 1%);
+    z-index: 20000;
 }
 
 .header .logo {
@@ -129,10 +171,48 @@ body {
     justify-content: center;
     text-align: center;
     position: relative;
+    overflow: hidden;
+}
+
+/* Slideshow */
+#hero-slideshow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+}
+
+.hero-slide.active {
+    opacity: 0.6; /* Slight transparency to blend with background/stars */
+}
+
+/* Add an overlay to ensure text readability over images */
+#hero-slideshow::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(5, 10, 20, 0.4); /* Dark overlay */
 }
 
 .hero-content {
     opacity: 0; /* JS will handle fade-in */
+    z-index: 1;
 }
 
 .hero h1.glitch {
