@@ -32,6 +32,7 @@ function initStarfield() {
 
     // Mouse Tracking
     let mouse = { x: null, y: null };
+    let isWarping = false; // Warp effect state
 
     window.addEventListener('mousemove', (e) => {
         mouse.x = e.clientX;
@@ -41,6 +42,24 @@ function initStarfield() {
     window.addEventListener('mouseleave', () => {
         mouse.x = null;
         mouse.y = null;
+    });
+
+    // Scroll listener for Warp Effect
+    window.addEventListener('scroll', () => {
+        const conceptSection = document.getElementById('concept');
+        if (conceptSection) {
+            const rect = conceptSection.getBoundingClientRect();
+            // Check if center of section is near center of viewport
+            const sectionCenter = rect.top + rect.height / 2;
+            const viewportCenter = window.innerHeight / 2;
+
+            // Activate warp if section is roughly in the middle
+            if (Math.abs(sectionCenter - viewportCenter) < window.innerHeight * 0.3) {
+                isWarping = true;
+            } else {
+                isWarping = false;
+            }
+        }
     });
 
     class Star {
@@ -62,10 +81,32 @@ function initStarfield() {
             this.opacity = Math.random();
             this.blinkSpeed = Math.random() * 0.02 + 0.005;
             this.blinkDir = 1;
+
+            // Attraction lifecycle
+            this.gatheredTime = 0;
+            this.maxGatheredTime = Math.random() * 100 + 50; // frames
         }
 
         update() {
+            if (isWarping) {
+                // Warp mode behavior: fast vertical streak
+                this.vy = -this.baseSpeed * 40; // Super fast
+                this.x += (width/2 - this.x) * 0.01; // Converge slightly to center top? Or just straight up
+                // Actually, warp usually is radial. But to keep it simple and consistent with vertical flow:
+                // Fast acceleration upwards.
+
+                this.y += this.vy;
+
+                // Wrap around quickly
+                if (this.y < 0) {
+                    this.y = height;
+                    this.x = Math.random() * width;
+                }
+                return;
+            }
+
             // Mouse Attraction Logic
+            let attracted = false;
             if (mouse.x != null && mouse.y != null) {
                 const dx = mouse.x - this.x;
                 const dy = mouse.y - this.y;
@@ -73,6 +114,7 @@ function initStarfield() {
                 const maxDistance = 400; // Attraction range
 
                 if (distance < maxDistance) {
+                    attracted = true;
                     const force = (maxDistance - distance) / maxDistance;
                     const attractionStrength = 0.5; // Adjust strength
 
@@ -81,6 +123,20 @@ function initStarfield() {
                     this.vx += Math.cos(angle) * force * attractionStrength;
                     this.vy += Math.sin(angle) * force * attractionStrength;
                 }
+            }
+
+            // Gathered lifecycle
+            if (attracted) {
+                this.gatheredTime++;
+                if (this.gatheredTime > this.maxGatheredTime) {
+                    // "Die" and reset if gathered for too long
+                    this.opacity -= 0.05;
+                    if (this.opacity <= 0) {
+                        this.reset();
+                    }
+                }
+            } else {
+                this.gatheredTime = Math.max(0, this.gatheredTime - 1);
             }
 
             // Apply velocity
@@ -119,8 +175,18 @@ function initStarfield() {
         draw() {
             ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
+
+            if (isWarping) {
+                // Draw streak
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x, this.y + 40); // Trail length
+                ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.lineWidth = this.size;
+                ctx.stroke();
+            } else {
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
     }
 
@@ -175,8 +241,8 @@ function initScrollAnimation() {
         });
     }, options);
 
-    // Target both fade-up and fade-in classes
-    const targets = document.querySelectorAll('.fade-up, .fade-in');
+    // Target fade-up, fade-in, and space-reveal classes
+    const targets = document.querySelectorAll('.fade-up, .fade-in, .space-reveal');
     targets.forEach(target => {
         observer.observe(target);
     });
